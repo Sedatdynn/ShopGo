@@ -45,7 +45,6 @@ class NetworkManager {
   Future dioPost({required String path, required model, required responseModel}) async {
     try {
       final response = await _dio.post(path, data: model.toJson());
-      print(response.data);
       if (response.statusCode == HttpStatus.ok) {
         final jsonBody = response.data;
         if (jsonBody is Map<String, dynamic>) {

@@ -1,8 +1,14 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shop_go/feature/login/cubit/login_cubit.dart';
 import 'package:shop_go/feature/login/cubit/login_state.dart';
+import 'package:shop_go/product/app/app_colors.dart';
+import 'package:shop_go/product/widget/loading/loading_widget.dart';
+import 'package:shop_go/product/widget/padding/app_paddings.dart';
+part './login_subview.dart';
 
+@RoutePage()
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
 
@@ -12,7 +18,7 @@ class LoginView extends StatelessWidget {
       create: (context) => LoginCubit(),
       child: Scaffold(
         body: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const AppPadding.normalAll(),
           child: BlocBuilder<LoginCubit, LoginState>(
             builder: (context, state) {
               return Column(
@@ -20,39 +26,10 @@ class LoginView extends StatelessWidget {
                 children: [
                   Center(child: Text('SHOP & GO', style: Theme.of(context).textTheme.titleLarge)),
                   const SizedBox(height: 30),
-                  TextFormField(
-                    textInputAction: TextInputAction.next,
-                    style: Theme.of(context).textTheme.titleSmall,
-                    keyboardType: TextInputType.name,
-                    onChanged: (val) => context.read<LoginCubit>().setUsername(val),
-                    decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.supervised_user_circle_sharp,
-                            color: Colors.deepOrangeAccent),
-                        hintText: 'username',
-                        hintStyle: Theme.of(context).textTheme.bodyLarge),
-                  ),
-                  TextFormField(
-                      style: Theme.of(context).textTheme.titleSmall,
-                      onChanged: (val) {
-                        if (val.isEmpty) return;
-                        context.read<LoginCubit>().setPassword(val);
-                      },
-                      obscureText: state.isVisible,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.vpn_key, color: Colors.deepOrangeAccent),
-                        hintText: 'password',
-                        suffixIcon: InkWell(
-                          onTap: () => context.read<LoginCubit>().changeVisible(),
-                          child: _CheckVisible(isVisible: state.isVisible),
-                        ),
-                      )),
+                  const _UsernameTextField(),
+                  const _PasswordTextField(),
                   const SizedBox(height: 30),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                        onPressed: () => context.read<LoginCubit>().logIn(),
-                        child: const Text('Login')),
-                  )
+                  const _LoginButton()
                 ],
               );
             },
@@ -60,15 +37,5 @@ class LoginView extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _CheckVisible extends StatelessWidget {
-  const _CheckVisible({required this.isVisible});
-  final bool isVisible;
-
-  @override
-  Widget build(BuildContext context) {
-    return isVisible ? const Icon(Icons.remove_red_eye) : const Icon(Icons.remove_red_eye_outlined);
   }
 }

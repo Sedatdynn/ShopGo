@@ -1,4 +1,6 @@
 import 'package:shop_go/core/cache/cache_manager.dart';
+import 'package:shop_go/core/navigator/app_router.dart';
+import 'package:shop_go/core/navigator/manager/auto_route_manager.dart';
 import 'package:shop_go/feature/login/cubit/i_login_cubit.dart';
 import 'package:shop_go/feature/login/cubit/login_state.dart';
 import 'package:shop_go/feature/login/model/login_request_model.dart';
@@ -30,11 +32,21 @@ class LoginCubit extends ILoginCubit {
 
   @override
   Future<void> logIn() async {
-    final result = await _loginService.logIn(
-        model: LoginRequestModel(username: state.username, password: state.password));
-    result.fold((failure) => setErrorMessage(failure.message), (token) async {
-      await CacheManager.instance.setStringValue(CacheKeys.access, token.access!);
-      await CacheManager.instance.setStringValue(CacheKeys.refresh, token.refresh!);
-    });
+    emit(state.copyWith(isLoading: true));
+    try {
+      final result = await _loginService.logIn(
+          model: LoginRequestModel(username: state.username, password: state.password));
+      result.fold((failure) {
+        emit(state.copyWith(isLoading: false));
+        setErrorMessage(failure.message);
+      }, (token) async {
+        await CacheManager.instance.setStringValue(CacheKeys.access, token.access!);
+        await CacheManager.instance.setStringValue(CacheKeys.refresh, token.refresh!);
+        emit(state.copyWith(isLoading: false));
+        RouteManager.instance.pushAndPopUntil(const WebRoute());
+      });
+    } catch (e) {
+      emit(state.copyWith(isLoading: false));
+    }
   }
 }

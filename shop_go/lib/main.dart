@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:shop_go/core/cache/cache_manager.dart';
-import 'package:shop_go/core/network/netwrok_manager.dart';
-import 'package:shop_go/feature/login/view/login_view.dart';
+import 'package:shop_go/product/app/app_colors.dart';
 import 'package:shop_go/product/app/app_constants.dart';
+import 'package:shop_go/product/app/app_initialize.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await CacheManager.preferencesInit();
-  await NetworkManager.instance.init(
-    baseUrl: AppConstants.baseUrl,
-    sendTimeOut: AppConstants.sendTimeout,
-    connectTimeOut: AppConstants.connectTimeout,
-    receiveTimeOut: AppConstants.receiveTimeout,
-  );
+  await AppInitialize().init();
   runApp(const MyApp());
 }
 
@@ -21,13 +13,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrangeAccent),
-      ),
-      home: const LoginView(),
-    );
+    return MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
+        ),
+        routerDelegate: AppConstants.appRouter.delegate(),
+        routeInformationParser: AppConstants.appRouter.defaultRouteParser());
   }
 }
